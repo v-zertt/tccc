@@ -12,6 +12,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 <style>
+@keyframes glitch-radio {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.005); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.radio-display.active {
+    animation: glitch-radio 0.15s infinite;
+    border-color: #ff2a3d !important;
+    background: rgba(255, 42, 61, 0.1) !important;
+}
+
 :root {
     --bg: #050608;
     --surface: rgba(15, 17, 21, 0.4);
@@ -434,28 +446,77 @@ header {
 .alarm-active {
     animation: alarm-flash 0.5s ease-in-out 2; /* Спалахне двічі */
 }
+
+.radio-unit {
+    background: #0a0c0f;
+    border: 2px solid #1a1d23;
+    padding: 20px;
+    border-radius: 4px;
+    position: relative;
+}
+.radio-display {
+    background: rgba(0, 255, 136, 0.05);
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    padding: 15px;
+    margin: 15px 0;
+    font-family: 'Courier New', monospace;
+    color: #00ff88;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.signal-dot {
+    width: 8px; height: 8px;
+    background: #00ff88;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+    box-shadow: 0 0 10px #00ff88;
+}
+.triage-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+.t-btn { padding: 10px 5px; border: none; font-family: var(--font-mil); font-size: 0.7rem; cursor: pointer; color: black; }
+.t-btn.red { background: #ff2a3d; }
+.t-btn.yellow { background: #ffcc00; }
+.t-btn.green { background: #00ff88; }
+
+.timer-bar {
+    height: 4px; background: var(--accent);
+    width: 100%; margin-top: 10px;
+    transition: width 5s linear;
+}
+/* Анімація хвиль */
+.wave-container { display: flex; gap: 3px; height: 20px; align-items: flex-end; }
+.wave { width: 3px; background: #00ff88; animation: bounce 0.5s infinite alternate; }
+.wave:nth-child(2) { animation-delay: 0.1s; }
+.wave:nth-child(3) { animation-delay: 0.2s; }
+@keyframes bounce { from { height: 5px; } to { height: 20px; } }
+
 </style>
 
 
 </head>
 
 <body>
-
+<audio id="radio-noise">
+    <source src="https://www.soundjay.com/communication/radio-static-05.mp3" type="audio/mpeg">
+</audio>
 <header>
-
-<div class="header-inner">
-
-<div class="logo">
-
-<svg viewBox="0 0 24 24"><path d="M19 3H5C3.89 3 3 3.9 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM17 13H13V17H11V13H7V11H11V7H13V11H17V13Z"/></svg>
-
-Тактична медицина
-
-</div>
-
-</div>
-
+    <div class="header-inner">
+        <div class="logo">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5C3.89 3 3 3.9 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM17 13H13V17H11V13H7V11H11V7H13V11H17V13Z"/></svg>
+            Тактична медицина
+        </div>
+        
+        <div id="sys-status" style="display: flex; gap: 15px; font-family: 'Courier New', monospace; font-size: 10px; color: var(--accent); border-left: 1px solid rgba(255,42,61,0.3); padding-left: 15px; text-transform: uppercase;">
+            <div class="hide-mobile">STATUS: <span style="color: #00ff88;">READY</span></div>
+            <div>BAT: <span id="hud-battery">--%</span></div>
+            <div class="hide-mobile">AZM: <span id="hud-azimuth">0</span>°</div>
+        </div>
+    </div>
 </header>
+
 
 <main class="main">
 
@@ -519,6 +580,38 @@ header {
     <h4>🎒 СКЛАДИ РЮКЗАК (IFAK)</h4>
     <p style="color: var(--text-dim);">Оберіть лише необхідні речі. Кожного разу — новий набір предметів!</p>
 </div>
+<div class="training-card radio-unit" id="radio-sim" style="border: 1px solid var(--accent); background: rgba(0,0,0,0.4); padding: 20px; border-radius: 2px;">
+    <div class="radio-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div style="display: flex; align-items: center;">
+            <span class="signal-dot"></span>
+            <h4 style="font-family: var(--font-mil); color: #fff; margin: 0;">RADIO INTERCEPT</h4>
+        </div>
+        <span id="radio-status" style="font-size: 0.7rem; color: var(--accent);">STANDBY</span>
+    </div>
+
+    <div id="radio-display" class="radio-display">
+        <div class="wave-container">
+            <div class="wave"></div><div class="wave"></div><div class="wave"></div><div class="wave"></div><div class="wave"></div>
+        </div>
+        <p style="font-size: 0.7rem; margin-top: 10px; opacity: 0.7;">CHANNEL: 44.00 MHz</p>
+    </div>
+
+    <button onclick="startRadioMission()" id="radio-start-btn" class="btn-mode" style="width: 100%; justify-content: center; background: rgba(255, 42, 61, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 15px; cursor: pointer; font-family: var(--font-mil); text-transform: uppercase; text-align: center;">
+        ПРИЙНЯТИ ДОПОВІДЬ
+    </button>
+    
+    <div id="triage-controls" style="display: none; margin-top: 15px;">
+        <div class="triage-btns" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <button onclick="checkRadioTriage('red')" class="t-btn-mil" style="background: #ff2a3d; color: #fff; border: none; padding: 12px; font-family: var(--font-mil); cursor: pointer;">immedieate</button>
+            <button onclick="checkRadioTriage('yellow')" class="t-btn-mil" style="background: #ffcc00; color: #000; border: none; padding: 12px; font-family: var(--font-mil); cursor: pointer;">delayed</button>
+            <button onclick="checkRadioTriage('green')" class="t-btn-mil" style="background: #00ff88; color: #000; border: none; padding: 12px; font-family: var(--font-mil); cursor: pointer;">minimal</button>
+        </div>
+        <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 15px;">
+            <div id="radio-timer" style="height: 100%; background: var(--accent); width: 100%; transition: width 15s linear;"></div>
+        </div>
+    </div>
+</div>
+
 
             </div>
             
@@ -1632,6 +1725,148 @@ function checkBackpack() {
         hideTraining();
     }
 }
+// Функція для отримання реального заряду батареї
+function updateBatteryStatus() {
+    if (navigator.getBattery) {
+        navigator.getBattery().then(function(battery) {
+            const display = document.getElementById('hud-battery');
+            
+            // Оновлюємо відсотки відразу
+            display.innerText = Math.round(battery.level * 100) + "%";
+            
+            // Колір залежно від заряду
+            if (battery.level <= 0.2) display.style.color = "#ff2a3d"; // Червоний якщо < 20%
+            else display.style.color = "#00ff88"; // Зелений
+            
+            // Слухаємо зміни
+            battery.addEventListener('levelchange', () => {
+                display.innerText = Math.round(battery.level * 100) + "%";
+            });
+        });
+    } else {
+        document.getElementById('hud-battery').innerText = "N/A";
+    }
+}
+
+// Азимут за рухом (на ПК за мишкою, на телефоні за нахилом, якщо доступно)
+window.addEventListener('mousemove', (e) => {
+    const azimuth = Math.floor((e.clientX / window.innerWidth) * 360);
+    const azmEl = document.getElementById('hud-azimuth');
+    if(azmEl) azmEl.innerText = azimuth;
+});
+
+// Запуск
+updateBatteryStatus();
+const radioScenarios = [
+    { 
+        audio: "Прийом! Це Сокіл! У нас один триста. Масивна кровотеча з бедра, джгут накладено, але він без свідомості і дихає дуже часто. Повторюю, без свідомості! Що робити?", 
+        correct: "red" 
+    },
+    { 
+        audio: "Це Грім! Маємо контакт. Один боєць отримав осколок у руку, рана забинтована, кровотеча під контролем, він притомний і може йти сам. Який пріоритет?", 
+        correct: "green" 
+    },
+    { 
+        audio: "У нас завал! Один боєць притомний, скаржиться на сильний біль у спині, ноги не відчуває. Кровотечі немає, дихання стабільне. Твій наказ?", 
+        correct: "yellow" 
+    },
+	 {audio: "Я Титан! Горіла машина, витягли водія. Обпалені руки та обличчя, шкіра злазить клаптями, але він кричить і бігає навколо. Дихає сам, голос не захрип. Куди його?!", 
+	     correct: "yellow"}, {audio: "Це Гром-2! Наступив на пелюстку! Ступні немає, відірвало наглухо! Джгут наклали, кров зупинили, він у свідомості, просить води. Нам чекати евак чи нести самим? Яка категорія?", correct: "red"}, {audio: "Це Сокіл-3! Контакт! У нас триста, важкий! Фонтан крові з-під паху, яскраво-червона! Він кричить, марить, уже блідий як стіна! Я не можу це затиснути, все слизьке! Швидко, який наказ?!", correct: "red"}
+];
+
+
+let currentRadioCorrect = "";
+let radioTimerTimeout;
+
+function startRadioMission() {
+    const scenario = radioScenarios[Math.floor(Math.random() * radioScenarios.length)];
+    currentRadioCorrect = scenario.correct;
+    
+    const noise = document.getElementById('radio-noise');
+    const status = document.getElementById('radio-status');
+    const timerBar = document.getElementById('radio-timer');
+    const display = document.getElementById('radio-display');
+    const btn = document.getElementById('radio-start-btn');
+    const controls = document.getElementById('triage-controls');
+
+    // 1. Ефект "Пшику" рації
+    if(noise) {
+        noise.volume = 0.4;
+        noise.play().catch(e => console.log("Audio play blocked"));
+    }
+
+    // 2. Візуальна активація
+    btn.style.display = 'none';
+    controls.style.display = 'block';
+    display.classList.add('active'); // Додаємо глітч-ефект (треба додати в CSS)
+    status.innerText = "INCOMING... ⚡";
+    status.style.color = "#ffcc00";
+
+    // 3. Налаштування "Бойового" голосу
+    const msg = new SpeechSynthesisUtterance(scenario.audio);
+    msg.lang = 'uk-UA';
+    msg.pitch = 0.1; // Вищий голос (напруження)
+    msg.rate = 1.25; // Швидка мова
+    msg.volume = 1.0;
+
+    msg.onstart = () => {
+        status.innerText = "LIVE TRANSMISSION ●";
+        status.style.color = "#ff2a3d";
+    };
+
+    msg.onend = () => {
+        status.innerText = "WAITING FOR RESPONSE...";
+        status.style.color = "#00ff88";
+        display.classList.remove('active');
+        if(noise) noise.play(); // Roger beep у кінці
+    };
+
+    // Запуск мовлення
+    window.speechSynthesis.cancel(); // Очистити чергу, якщо була
+    window.speechSynthesis.speak(msg);
+
+    // 4. Таймер на 15 секунд
+    timerBar.style.transition = "none";
+    timerBar.style.width = "100%";
+    
+    // Невелика затримка, щоб браузер встиг "скинути" анімацію
+    setTimeout(() => {
+        timerBar.style.transition = "width 15s linear";
+        timerBar.style.width = "0%";
+    }, 50);
+
+    radioTimerTimeout = setTimeout(() => {
+        window.speechSynthesis.cancel();
+        alert("ЗВ'ЯЗОК ПЕРЕРВАНО. ЧАС ВИЙШОВ!");
+        resetRadio();
+    }, 15000); 
+}
+
+function checkRadioTriage(choice) {
+    window.speechSynthesis.cancel();
+    clearTimeout(radioTimerTimeout);
+    
+    if (choice === currentRadioCorrect) {
+        // Можна додати звук "успіху" тут
+        alert("ВІРНО! ПРІОРІТЕТ ВИЗНАЧЕНО ПРАВИЛЬНО.");
+    } else {
+        alert("ПОМИЛКА! НЕВІРНА ОЦІНКА СТАНУ.");
+    }
+    resetRadio();
+}
+
+function resetRadio() {
+    document.getElementById('radio-start-btn').style.display = 'block';
+    document.getElementById('triage-controls').style.display = 'none';
+    document.getElementById('radio-status').innerText = "STANDBY";
+    document.getElementById('radio-status').style.color = "var(--accent)";
+    document.getElementById('radio-display').classList.remove('active');
+    
+    const timerBar = document.getElementById('radio-timer');
+    timerBar.style.transition = "none";
+    timerBar.style.width = "100%";
+}
+
 
 </script>
 
