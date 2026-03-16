@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Тактична медицина — довідник домедичної допомоги</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --bg: #050608;
+    --surface: rgba(15, 17, 21, 0.4);
+    --surface-hover: rgba(25, 28, 35, 0.6);
+    --accent: #ff2a3d; /* Neon Tactical Red */
+    --accent-glow: rgba(255, 42, 61, 0.5);
+    --text-main: #f0f0f0;
+    --text-dim: #8b96a8;
+    --font-mil: 'Oswald', sans-serif;
+    --font-main: 'Roboto', sans-serif;
+    --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Пружинна анімація */
+}
+
+/* --- Base & Animated Background --- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    background-color: var(--bg);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+    position: relative;
+}
+/* Дизайн секції тренувань */
+#training-section {
+    display: none;
+    max-width: 1300px;
+    margin: 0 auto 80px;
+    padding: 0 20px;
+    animation: cardEntry 0.5s ease;
+}
+
+.training-card {
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 42, 61, 0.2);
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.mode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin: 30px 0;
+}
+
+/* Кнопки вибору як твої картки */
+.btn-mode {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 30px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: left;
+}
+
+.btn-mode:hover {
+    background: var(--surface-hover);
+    transform: translateY(-5px);
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(255, 42, 61, 0.1);
+}
+
+.btn-mode h4 {
+    font-family: var(--font-mil);
+    text-transform: uppercase;
+    color: #fff;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+/* Варіанти відповідей */
+.step-box {
+    display: grid;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.step-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 1.1rem;
+}
+
+.step-item:hover {
+    border-color: var(--accent);
+    background: rgba(255, 42, 61, 0.1);
+}
+
+.step-item.correct {
+    border-color: #00ff88;
+    color: #00ff88;
+    background: rgba(0, 255, 136, 0.05);
+}
+
+/* Ефект радару на фоні */
+body::before {
+    content: "";
+    position: fixed;
+    top: 50%; left: 50%;
+    width: 200vw; height: 200vw;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255, 42, 61, 0.03) 0%, transparent 60%);
+    z-index: -2;
+    animation: pulse 8s infinite alternate;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: -1;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+}
+
+/* --- Military Header Section (WOW Effect) --- */
+.hero-section {
+    padding: 100px 20px 40px;
+    text-align: center;
+    position: relative;
+}
+
+.mil-title {
+    font-family: var(--font-mil);
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 0.9;
+    letter-spacing: -2px;
+    margin-bottom: 10px;
+    /* Лазерний ефект тексту */
+    background: linear-gradient(90deg, #fff 0%, #a0a0a0 40%, var(--accent) 50%, #a0a0a0 60%, #fff 100%);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shine 4s linear infinite;
+    filter: drop-shadow(0 0 20px rgba(255, 42, 61, 0.2));
+}
+
+@keyframes shine {
+    to { background-position: 200% center; }
+}
+
+.mil-subtitle {
+    display: inline-block;
+    font-size: 1rem;
+    letter-spacing: 12px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-top: 15px;
+    font-weight: 600;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 0;
+}
+
+/* --- Header & Navigation --- */
+header {
+    background: rgba(5, 6, 8, 0.7);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 42, 61, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.header-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: var(--font-mil);
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.logo svg { width: 26px; fill: var(--accent); filter: drop-shadow(0 0 5px var(--accent)); }
+
+/* --- Search --- */
+.search { max-width: 650px; margin: 20px auto 50px; position: relative; }
+
+.search input {
+    width: 100%;
+    padding: 18px 20px 18px 55px;
+    background: rgba(10, 12, 16, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1.1rem;
+    outline: none;
+    transition: var(--transition);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+}
+
+.search input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 25px rgba(255, 42, 61, 0.15), inset 0 0 10px rgba(255, 42, 61, 0.1);
+    transform: translateY(-2px);
+}
+
+.search svg {
+    position: absolute; left: 20px; top: 50%;
+    transform: translateY(-50%); width: 22px; fill: var(--accent);
+}
+
+/* --- Filters --- */
+.filters {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+    margin-bottom: 50px;
+}
+
+.filters button {
+    padding: 10px 24px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 6px;
+    color: var(--text-dim);
+    font-family: var(--font-mil);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.filters button::after {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 100%; height: 2px; background: var(--accent);
+    transform: scaleX(0); transition: transform 0.3s ease;
+}
+
+.filters button:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+.filters button.active { color: #fff; border-color: rgba(255, 42, 61, 0.3); background: rgba(255, 42, 61, 0.05); box-shadow: 0 0 15px rgba(255, 42, 61, 0.1); }
+.filters button.active::after { transform: scaleX(1); }
+
+/* --- Grid & Cards (Tactical Glass Effect) --- */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+    max-width: 1300px;
+    margin: 0 auto 80px;
+    padding: 0 20px;
+}
+
+.card {
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-top: 1px solid rgba(255,255,255,0.15); /* Блік світла зверху */
+    border-radius: 12px;
+    padding: 30px;
+    position: relative;
+    cursor: pointer;
+    transition: var(--transition);
+    pointer-events: all;
+    animation: cardEntry 0.5s ease backwards;
+}
+
+@keyframes cardEntry {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card::before {
+    content: ""; position: absolute;
+    top: -1px; left: 10%; width: 0%; height: 2px;
+    background: var(--accent);
+    transition: var(--transition);
+    box-shadow: 0 0 15px var(--accent);
+}
+
+.card:hover {
+    background: var(--surface-hover);
+    transform: translateY(-8px) scale(1.02);
+    border-color: rgba(255, 42, 61, 0.2);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 20px rgba(255, 42, 61, 0.05);
+}
+
+.card:hover::before { width: 80%; }
+
+.card h3 {
+    font-family: var(--font-mil);
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    color: #fff;
+}
+
+.card p { color: var(--text-dim); font-size: 0.95rem; }
+
+/* --- Tags --- */
+.tags { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+.tag {
+    font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 4px;
+    background: rgba(255, 42, 61, 0.08);
+    border: 1px solid rgba(255, 42, 61, 0.2);
+    color: var(--accent); text-transform: uppercase;
+}
+
+/* --- Modal 2.0 (Cinematic) --- */
+.modal {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(15px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 2000; padding: 20px;
+}
+
+.modal.active { display: flex; animation: modalBg 0.3s ease; }
+@keyframes modalBg { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-box {
+    background: #0d0f14;
+    width: 100%; max-width: 850px; max-height: 90vh;
+    overflow-y: auto; border-radius: 16px;
+    border: 1px solid rgba(255, 42, 61, 0.3);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(255, 42, 61, 0.05);
+    position: relative;
+    transform: scale(0.95); opacity: 0;
+    animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes modalPop {
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+    padding: 25px 30px;
+    background: rgba(255, 42, 61, 0.05);
+    border-bottom: 1px solid rgba(255, 42, 61, 0.2);
+    display: flex; justify-content: space-between; align-items: center;
+}
+
+.modal-header h2 { font-family: var(--font-mil); font-size: 1.8rem; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+.modal-header button {
+    background: transparent; border: none; color: var(--text-dim);
+    font-size: 1.5rem; cursor: pointer; transition: 0.2s;
+}
+.modal-header button:hover { color: var(--accent); transform: rotate(90deg); }
+
+.modal-body { padding: 35px; color: #e0e0e0; font-size: 1.05rem; }
+
+.warning {
+    border-left: 4px solid var(--accent); border-radius: 4px;
+    padding: 18px; margin-bottom: 25px;
+    background: linear-gradient(90deg, rgba(255, 42, 61, 0.15) 0%, transparent 100%);
+    color: #ff8a8a; font-weight: 500; font-family: var(--font-mil); text-transform: uppercase; letter-spacing: 1px;
+}
+
+.modal-body h4 { font-family: var(--font-mil); color: var(--accent); margin: 25px 0 10px; text-transform: uppercase; font-size: 1.2rem; }
+.modal-body ul, .modal-body ol { margin-left: 20px; margin-bottom: 15px; }
+.modal-body li { margin-bottom: 8px; color: var(--text-dim); }
+.modal-body li::marker { color: var(--accent); }
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(255, 42, 61, 0.5); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* --- Mobile --- */
+@media (max-width: 768px) {
+    .mil-title { font-size: 3.5rem; }
+    .hero-section { padding: 60px 15px 30px; }
+    .grid { grid-template-columns: 1fr; padding: 0 15px; }
+    .modal-box { border-radius: 10px; }
+}
+
+
+
+.medevac-grid {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    gap: 10px;
+    font-family: 'Courier New', monospace;
+    background: rgba(0,0,0,0.3);
+    padding: 15px;
+    border: 1px dashed var(--accent);
+}
+.line-num { color: var(--accent); font-weight: bold; }
+@keyframes alarm-flash {
+    0% { background-color: var(--bg); }
+    50% { background-color: #ff0000; }
+    100% { background-color: var(--bg); }
+}
+
+.alarm-active {
+    animation: alarm-flash 0.5s ease-in-out 2; /* Спалахне двічі */
+}
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<div class="header-inner">
+
+<div class="logo">
+
+<svg viewBox="0 0 24 24"><path d="M19 3H5C3.89 3 3 3.9 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM17 13H13V17H11V13H7V11H11V7H13V11H17V13Z"/></svg>
+
+Тактична медицина
+
+</div>
+
+</div>
+
+</header>
+
+<main class="main">
+
+<div class="search">
+
+<input id="search" placeholder="Пошук тем домедичної допомоги...">
+
+<svg viewBox="0 0 24 24"><path d="M15.5 14H14.7L14.4 13.7A6.5 6.5 0 1016 9.5c0 1.6-.59 3.1-1.57 4.23l.27.27h.8L20 19.49 21.49 18 15.5 14z"/></svg>
+
+</div>
+
+<div class="filters">
+
+<button class="active" data="all">Всі</button>
+
+<button data="bls">BLS</button>
+
+<button data="resuscitation">СЛР</button>
+
+<button data="trauma">Травми</button>
+
+<button data="poison">Отруєння</button>
+
+<button data="environment">Середовище</button>
+
+<button data="training">Тренування</button>
+
+</div>
+
+<div id="grid" class="grid"></div>
+
+</main>
+<section id="training-section" style="display: none;">
+    <div class="training-card">
+        <div id="timer-container" style="display: none; width: 100%; height: 4px; background: #222; margin-bottom: 20px;">
+            <div id="timer-bar" style="width: 100%; height: 100%; background: var(--accent); transition: width 1s linear;"></div>
+        </div>
+
+        <div id="training-menu">
+            <h2 class="mil-title" style="font-size: 3.5rem; text-align: left; margin-bottom: 10px;">Tactical Drill</h2>
+            <div class="mil-subtitle" style="letter-spacing: 5px; margin-bottom: 40px;">Час — це життя</div>
+            
+            <div class="mode-grid">
+                <div class="btn-mode" onclick="startSequence()">
+                    <h4>⛓️ АЛГОРИТМ MARCH</h4>
+                    <p style="color: var(--text-dim);">Відпрацювання пріоритетів. Помилка або затримка — фатальна.</p>
+                </div>
+                <div class="btn-mode" onclick="startCombatTest()">
+                    <h4>⚡ БОЙОВИЙ ІСПИТ</h4>
+                    <p style="color: var(--text-dim);">20 ситуацій. У тебе 15 секунд на кожне рішення.</p>
+                </div>
+<div class="btn-mode" onclick="startTriage()">
+    <h4>🚑 СОРТУВАННЯ (TRIAGE)</h4>
+    <p style="color: var(--text-dim);">Визначте, кому допомога потрібна негайно, а хто може зачекати.</p>
+</div>
+<div class="btn-mode" onclick="startTriageSequence()">
+    <h4>🚑 СОРТУВАННЯ (MASS)</h4>
+    <p style="color: var(--text-dim);">Розставте черговість допомоги для 4 поранених за 30 секунд.</p>
+</div>
+<div class="btn-mode" onclick="startBackpackSim()">
+    <h4>🎒 СКЛАДИ РЮКЗАК (IFAK)</h4>
+    <p style="color: var(--text-dim);">Оберіть лише необхідні речі. Кожного разу — новий набір предметів!</p>
+</div>
+
+            </div>
+            
+            <button onclick="hideTraining()" style="background: none; border: 1px solid #444; color: #888; padding: 12px 25px; cursor: pointer; font-family: var(--font-mil); text-transform: uppercase;">← Назад до бази</button>
+        </div>
+
+        <div id="training-game" style="display: none;">
+            <div id="game-content"></div>
+        </div>
+    </div>
+</section>
+
+<div class="modal" id="modal">
+
+<div class="modal-box">
+
+<div class="modal-header">
+
+<h2 id="modalTitle"></h2>
+
+<button onclick="closeModal()">✕</button>
+
+</div>
+
+<div id="modalBody" class="modal-body"></div>
+
+</div>
+
+</div><script>
+
+const database = [
+
+{
+title:"Алгоритм BLS (базова підтримка життя)",
+category:"bls",
+tags:["BLS","алгоритм","реанімація"],
+desc:"Алгоритм допомоги непритомній людині.",
+content:`
+
+<div class="warning">
+BLS — базова підтримка життя до прибуття медиків.
+</div>
+
+<h4>Що таке BLS</h4>
+<p>
+BLS (Basic Life Support) — це комплекс базових дій для підтримки
+дихання та кровообігу людини до прибуття професійної медичної допомоги.
+</p>
+
+<h4>Алгоритм</h4>
+
+<ol>
+
+<li>Переконатися у безпеці місця.</li>
+
+<li>Перевірити свідомість (звернутись до людини).</li>
+
+<li>Покликати на допомогу.</li>
+
+<li>Перевірити дихання до 10 секунд.</li>
+
+<li>Якщо дихання немає — викликати 103.</li>
+
+<li>Почати СЛР.</li>
+
+</ol>
+
+`
+},
+
+{
+title:"Серцево-легенева реанімація",
+category:"resuscitation",
+tags:["СЛР","реанімація"],
+desc:"Метод підтримки кровообігу при зупинці серця.",
+content:`
+
+<div class="warning">
+Без кисню мозок починає пошкоджуватись через 3-5 хвилин.
+</div>
+
+<h4>Ознаки клінічної смерті</h4>
+
+<ul>
+<li>відсутність свідомості</li>
+<li>відсутність нормального дихання</li>
+<li>відсутність реакції</li>
+</ul>
+
+<h4>Алгоритм СЛР</h4>
+
+<ol>
+
+<li>Покласти постраждалого на тверду поверхню.</li>
+
+<li>Руки розмістити у центрі грудної клітки.</li>
+
+<li>Виконувати компресії.</li>
+
+<li>Після 30 компресій зробити 2 вдихи.</li>
+
+<li>Продовжувати до появи ознак життя або прибуття медиків.</li>
+
+</ol>
+
+<h4>Параметри компресій</h4>
+
+<ul>
+
+<li>частота: 100–120/хв</li>
+
+<li>глибина: 5–6 см</li>
+
+<li>співвідношення: 30:2</li>
+
+</ul>
+
+`
+},
+
+{
+title:"Автоматичний зовнішній дефібрилятор",
+category:"resuscitation",
+tags:["АЗД","дефібрилятор"],
+desc:"Пристрій для відновлення серцевого ритму.",
+content:`
+
+<h4>Що таке АЗД</h4>
+
+<p>
+Автоматичний зовнішній дефібрилятор — це прилад,
+який аналізує серцевий ритм і за потреби подає електричний розряд.
+</p>
+
+<h4>Коли використовувати</h4>
+
+<ul>
+<li>людина без свідомості</li>
+<li>немає нормального дихання</li>
+</ul>
+
+<h4>Алгоритм</h4>
+
+<ol>
+
+<li>Увімкнути АЗД.</li>
+<li>Оголити грудну клітку.</li>
+<li>Приклеїти електроди.</li>
+<li>Дати апарату проаналізувати ритм.</li>
+<li>Якщо потрібно — виконати розряд.</li>
+<li>Продовжити СЛР.</li>
+
+</ol>
+
+`
+},
+
+{
+title:"PBLS — реанімація дітей",
+category:"resuscitation",
+tags:["діти","реанімація"],
+desc:"Особливості СЛР у дітей.",
+content:`
+
+<h4>Особливості</h4>
+
+<ul>
+
+<li>глибина компресій — 1/3 грудної клітки</li>
+
+<li>частота — 100-120</li>
+
+<li>у немовлят компресії виконують двома пальцями</li>
+
+</ul>
+
+`
+},
+
+{
+title:"Асфіксія (удушення)",
+category:"trauma",
+tags:["дихальні шляхи"],
+desc:"Стороннє тіло у дихальних шляхах.",
+content:`
+
+<h4>Ознаки</h4>
+
+<ul>
+
+<li>людина не може говорити</li>
+
+<li>хапається за горло</li>
+
+<li>немає кашлю або дихання</li>
+
+</ul>
+
+<h4>Прийом Геймліха</h4>
+
+<ol>
+
+<li>Стати позаду постраждалого.</li>
+
+<li>Обхопити руками живіт.</li>
+
+<li>Різко натиснути під ребрами всередину та вгору.</li>
+
+</ol>
+
+`
+},
+
+{
+title:"Критична кровотеча",
+category:"trauma",
+tags:["турнікет","кров"],
+desc:"Зупинка масивної кровотечі.",
+content:`
+
+<div class="warning">
+Масивна кровотеча може призвести до смерті за кілька хвилин.
+</div>
+
+<h4>Ознаки</h4>
+
+<ul>
+
+<li>сильний потік крові</li>
+
+<li>швидке просочення одягу</li>
+
+<li>калюжа крові</li>
+
+</ul>
+
+<h4>Алгоритм</h4>
+
+<ol>
+
+<li>Натиснути на рану.</li>
+
+<li>Накласти турнікет вище рани.</li>
+
+<li>Затягнути до повної зупинки крові.</li>
+
+<li>Записати час накладання.</li>
+
+</ol>
+
+`
+},
+
+{
+title:"Види турнікетів",
+category:"trauma",
+tags:["турнікет"],
+desc:"Основні типи турнікетів.",
+content:`
+
+<ul>
+
+<li>CAT</li>
+
+<li>SOFT-T</li>
+
+<li>SWAT-T</li>
+
+<li>джгут Есмарха</li>
+
+</ul>
+
+`
+},
+
+{
+title:"Переломи",
+category:"trauma",
+tags:["перелом"],
+desc:"Ознаки перелому та допомога.",
+content:`
+
+<h4>Ознаки</h4>
+
+<ul>
+
+<li>сильний біль</li>
+
+<li>деформація кінцівки</li>
+
+<li>набряк</li>
+
+<li>неможливість руху</li>
+
+</ul>
+
+<h4>Дії</h4>
+
+<ul>
+
+<li>іммобілізувати кінцівку</li>
+
+<li>накласти шину</li>
+
+<li>викликати швидку</li>
+
+</ul>
+
+`
+},
+
+{
+title:"Опіки",
+category:"trauma",
+tags:["опік"],
+desc:"Перша допомога при опіках.",
+content:`
+
+<ul>
+
+<li>охолодити місце опіку водою</li>
+
+<li>накласти стерильну пов'язку</li>
+
+<li>не проколювати пухирі</li>
+
+</ul>
+
+`
+},
+
+{
+title:"Утоплення",
+category:"trauma",
+tags:["вода"],
+desc:"Допомога після утоплення.",
+content:`
+
+<h4>Ознаки</h4>
+
+<ul>
+
+<li>кашель</li>
+
+<li>синя шкіра</li>
+
+<li>відсутність дихання</li>
+
+</ul>
+
+<h4>Дії</h4>
+
+<ol>
+
+<li>витягнути з води</li>
+
+<li>перевірити дихання</li>
+
+<li>почати СЛР</li>
+
+</ol>
+
+`
+},
+
+{
+title:"Електротравма",
+category:"trauma",
+tags:["електрика"],
+desc:"Ураження струмом.",
+content:`
+
+<ol>
+
+<li>вимкнути джерело струму</li>
+
+<li>не торкатись людини руками</li>
+
+<li>викликати швидку</li>
+
+</ol>
+
+`
+},
+
+{
+title:"Отруєння",
+category:"poison",
+tags:["токсини"],
+desc:"Отруєння газами або речовинами.",
+content:`
+
+<h4>Ознаки</h4>
+
+<ul>
+
+<li>запаморочення</li>
+
+<li>нудота</li>
+
+<li>втрата свідомості</li>
+
+</ul>
+
+`
+},
+
+{
+title:"Анафілактичний шок",
+category:"environment",
+tags:["алергія"],
+desc:"Небезпечна алергічна реакція.",
+content:`
+
+<div class="warning">
+Анафілаксія може призвести до смерті за кілька хвилин.
+</div>
+
+<h4>Ознаки</h4>
+
+<ul>
+
+<li>набряк горла</li>
+
+<li>важке дихання</li>
+
+<li>висип</li>
+
+<li>запаморочення</li>
+
+</ul>
+
+<h4>Дії</h4>
+
+<ol>
+
+<li>викликати швидку</li>
+
+<li>використати адреналін (якщо є)</li>
+
+<li>контролювати дихання</li>
+
+</ol>
+
+`
+},
+
+{
+title:"Тепловий удар",
+category:"environment",
+tags:["перегрів"],
+desc:"Перегрів організму.",
+content:`
+
+<ul>
+
+<li>перенести людину у тінь</li>
+
+<li>охолоджувати</li>
+
+<li>дати воду</li>
+
+</ul>
+
+`
+},
+
+{
+title:"Переохолодження",
+category:"environment",
+tags:["холод"],
+desc:"Зниження температури тіла.",
+content:`
+
+<ul>
+
+<li>зігріти постраждалого</li>
+
+<li>зняти мокрий одяг</li>
+
+<li>дати тепле пиття</li>
+
+</ul>
+
+`
+},
+
+{
+title:"Укуси комах",
+category:"environment",
+tags:["алергія"],
+desc:"Допомога при укусах.",
+content:`
+
+<ul>
+
+<li>видалити жало</li>
+
+<li>охолодити місце укусу</li>
+
+<li>дати антигістамінні</li>
+
+</ul>
+
+`
+},
+
+{
+title:"Укуси змій",
+category:"environment",
+tags:["змії"],
+desc:"Перша допомога.",
+content:`
+
+<ul>
+
+<li>іммобілізувати кінцівку</li>
+
+<li>не висмоктувати отруту</li>
+
+<li>викликати медиків</li>
+
+</ul>
+
+`
+},
+
+{
+title:"Судоми",
+category:"environment",
+tags:["судоми"],
+desc:"Допомога при судомному нападі.",
+content:`
+
+<ul>
+
+<li>прибрати небезпечні предмети</li>
+
+<li>не стримувати силою</li>
+
+<li>після нападу перевернути на бік</li>
+
+</ul>
+
+`
+},
+
+{
+title:"Відновне положення",
+category:"bls",
+tags:["положення"],
+desc:"Положення непритомної людини.",
+content:`
+
+<p>
+Якщо людина без свідомості, але дихає,
+її потрібно покласти на бік для запобігання
+потраплянню блювоти у дихальні шляхи.
+</p>
+
+`
+},
+
+{
+title:"Алгоритм MARCH",
+category:"trauma",
+tags:["tccc"],
+desc:"Тактичний алгоритм допомоги.",
+content:`
+
+<ol>
+
+<li>M — Massive bleeding</li>
+
+<li>A — Airway</li>
+
+<li>R — Respiration</li>
+
+<li>C — Circulation</li>
+
+<li>H — Hypothermia</li>
+
+</ol>
+
+`
+}
+
+]
+</script><script>
+
+const grid = document.getElementById("grid")
+const modal = document.getElementById("modal")
+const modalTitle = document.getElementById("modalTitle")
+const modalBody = document.getElementById("modalBody")
+
+function renderCards(list){
+
+grid.innerHTML=""
+
+list.forEach((item,i)=>{
+
+const card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+
+<h3>${item.title}</h3>
+
+<p>${item.desc}</p>
+
+<div class="tags">
+
+${item.tags.map(t=>`<span class="tag">${t}</span>`).join("")}
+
+</div>
+
+`
+
+card.onclick=()=>openModal(item)
+
+grid.appendChild(card)
+
+})
+
+}
+
+function openModal(item){
+
+modal.classList.add("active")
+
+modalTitle.innerText=item.title
+
+modalBody.innerHTML=item.content
+
+}
+
+function closeModal(){
+
+modal.classList.remove("active")
+
+}
+
+renderCards(database)
+
+</script>
+
+
+<script>
+
+const search = document.getElementById("search");
+
+search.addEventListener("input", () => {
+    // Отримуємо значення, прибираємо зайві прогалини
+    const value = search.value.toLowerCase().trim();
+
+    // 1. ПЕРЕВІРКА НА "ПАСХАЛКУ"
+    if (value === "000" || value === "sos") {
+        triggerEmergency();
+        search.value = ""; // Очищуємо поле пошуку
+        return; // Зупиняємо виконання, щоб не фільтрувати картки
+    }
+
+    // 2. СТАНДАРТНИЙ ПОШУК (якщо це не пасхалка)
+    const filtered = database.filter(item =>
+        item.title.toLowerCase().includes(value) ||
+        item.desc.toLowerCase().includes(value) ||
+        item.tags.join(" ").toLowerCase().includes(value)
+    );
+
+    renderCards(filtered);
+});
+
+// Функція для активації режиму тривоги
+function triggerEmergency() {
+    // Додаємо червоний спалах на весь екран
+    document.body.classList.add("alarm-active");
+    
+    // Прибираємо ефект спалаху через 1 секунду
+    setTimeout(() => {
+        document.body.classList.remove("alarm-active");
+    }, 1000);
+
+    // Відкриваємо модалку з протоколом евакуації
+    openModal({
+        title: "⚠️ EMERGENCY: 9-LINE MEDEVAC",
+        content: `
+            <div class="warning">ПРОТОКОЛ ЕКСТРЕНОЇ ЕВАКУАЦІЇ ПЕРЕДАЄТЬСЯ ЧЕРЕЗ РАДІОЗВ'ЯЗОК</div>
+            <div class="medevac-grid" style="display: grid; grid-template-columns: 40px 1fr; gap: 10px; background: rgba(0,0,0,0.4); padding: 15px; border: 1px dashed var(--accent); font-family: monospace; font-size: 0.9rem;">
+                <div style="color:var(--accent)">L1</div><div>Location: Координати місця збору</div>
+                <div style="color:var(--accent)">L2</div><div>Freq/Callsign: Частота та позивний</div>
+                <div style="color:var(--accent)">L3</div><div>Patients by precedence: Пріоритет (A, B, C)</div>
+                <div style="color:var(--accent)">L4</div><div>Equipment: Необхідне спецобладнання</div>
+                <div style="color:var(--accent)">L5</div><div>Patients by type: Кількість (Litter/Amb)</div>
+                <div style="color:var(--accent)">L6</div><div>Security: Безпека майданчика (N, P, E, X)</div>
+                <div style="color:var(--accent)">L7</div><div>Marking: Маркування (A, B, C, D)</div>
+                <div style="color:var(--accent)">L8</div><div>Nationality: Статус пацієнтів</div>
+                <div style="color:var(--accent)">L9</div><div>Contamination: Забруднення (N, B, C)</div>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.8rem; color: var(--text-dim);">* Використовуйте фонетичний алфавіт НАТО (Alpha, Bravo, Charlie...) для чіткості.</p>
+        `
+    });
+}
+
+</script>
+
+
+<script>
+
+const allBtns = document.querySelectorAll(".filters button");
+const mainArea = document.querySelector(".main");
+const trainingArea = document.getElementById("training-section");
+
+allBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        const category = btn.getAttribute("data");
+
+        // Активуємо кнопку візуально
+        allBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        if (category === "training") {
+            // Ховаємо довідник, показуємо тренування
+            mainArea.style.display = "none";
+            trainingArea.style.display = "block";
+            window.scrollTo(0, 0);
+        } else {
+            // Ховаємо тренування, показуємо довідник
+            trainingArea.style.display = "none";
+            mainArea.style.display = "block";
+
+            // Логіка фільтрації карток
+            if (category === "all") {
+                renderCards(database);
+            } else {
+                const filtered = database.filter(item => item.category === category);
+                renderCards(filtered);
+            }
+        }
+    });
+});
+
+
+</script>
+
+
+<script>
+
+window.onclick=function(e){
+
+if(e.target===modal){
+
+closeModal()
+
+}
+
+}
+
+document.addEventListener("keydown",e=>{
+
+if(e.key==="Escape") closeModal()
+
+})
+let trainingTimer;
+let timeLeft;
+
+// 1. ПРИВ'ЯЗКА КНОПКИ У ФІЛЬТРАХ
+document.querySelector('button[data="training"]').onclick = function() {
+    document.querySelector('.main').style.display = 'none';
+    document.getElementById('training-section').style.display = 'block';
+    window.scrollTo(0,0);
+};
+
+function hideTraining() {
+    clearInterval(trainingTimer);
+    document.getElementById('timer-container').style.display = 'none';
+    document.getElementById('training-section').style.display = 'none';
+    document.querySelector('.main').style.display = 'block';
+    document.getElementById('training-menu').style.display = 'block';
+    document.getElementById('training-game').style.display = 'none';
+}
+
+// 2. ЛОГІКА ТАЙМЕРА
+function startTimer(seconds, callback) {
+    clearInterval(trainingTimer);
+    document.getElementById('timer-container').style.display = 'block';
+    timeLeft = seconds;
+    const bar = document.getElementById('timer-bar');
+    bar.style.width = '100%';
+    
+    trainingTimer = setInterval(() => {
+        timeLeft--;
+        bar.style.width = (timeLeft / seconds) * 100 + '%';
+        if (timeLeft <= 0) {
+            clearInterval(trainingTimer);
+            alert("ЧАС ВИЙШОВ! ТИ НЕ ВСТИГ ДОПОМОГТИ.");
+            hideTraining();
+        }
+    }, 1000);
+}
+
+// 3. РЕЖИМ MARCH (ПРАВИЛЬНИЙ)
+function startSequence() {
+    document.getElementById('training-menu').style.display = 'none';
+    document.getElementById('training-game').style.display = 'block';
+    
+    const correctOrder = [
+        "Massive Hemorrhage (Кровотеча)",
+        "Airway (Дихальні шляхи)",
+        "Respiration (Дихання)",
+        "Circulation (Циркуляція)",
+        "Hypothermia (Гіпотермія)"
+    ];
+    
+    let currentIdx = 0;
+    const target = document.getElementById('game-content');
+    target.innerHTML = `<h3 style="font-family: var(--font-mil); color: var(--accent); margin-bottom: 20px;">ВСТАНОВІТЬ ПОСЛІДОВНІСТЬ MARCH:</h3><div class="step-box" id="s-box"></div>`;
+    
+    startTimer(15); // 15 секунд на весь алгоритм
+
+    [...correctOrder].sort(() => Math.random() - 0.5).forEach(txt => {
+        const d = document.createElement('div');
+        d.className = 'step-item';
+        d.innerText = txt;
+        d.onclick = () => {
+            if(txt === correctOrder[currentIdx]) {
+                d.classList.add('correct');
+                d.style.pointerEvents = 'none';
+                currentIdx++;
+                if(currentIdx === correctOrder.length) {
+                    clearInterval(trainingTimer);
+                    alert("БЛИСКУЧЕ! АЛГОРИТМ ВІРНИЙ.");
+                    hideTraining();
+                }
+            } else {
+                alert("НЕВІРНО! ПОРУШЕНО ПРІОРИТЕТ ДОПОМОГИ.");
+                hideTraining();
+            }
+        };
+        document.getElementById('s-box').appendChild(d);
+    });
+}
+
+const combatQs = [
+    { q: "Критична кровотеча з кінцівки у 'Червоній зоні'. Твоя дія?", a: ["Накласти турнікет максимально високо і туго", "Зробити тиснучу пов'язку", "Тампонувати рану"], c: 0 },
+    { q: "Який пульс перевіряти при шоковому стані (буква C)?", a: ["На руці (променевий)", "На сонній артерії", "Не перевіряти взагалі"], c: 1 },
+    { q: "Чути звук всмоктування повітря з рани в грудях. Дія?", a: ["Оклюзійна наклейка (клапанна)", "Турнікет на груди", "Промити водою"], c: 0 },
+    { q: "Де кріпиться картка пораненого після надання допомоги?", a: ["У кишеню", "На видному місці (на плече або груди)", "Віддається командиру"], c: 1 },
+    { q: "Що робити з пораненим у 'Червоній зоні', якщо вогонь триває?", a: ["Надавати допомогу на місці", "Вогонь у відповідь та евакуація", "Покликати медика"], c: 1 },
+    { q: "Буква 'R' в MARCH — це?", a: ["Respiration (Дихання)", "Reaction (Реакція)", "Rescue (Евакуація)"], c: 0 },
+    { q: "Яка ознака напруженого пневмотораксу?", a: ["Різке погіршення дихання + зміщення трахеї", "Біль у животі", "Втрата зору"], c: 0 },
+    { q: "Куди вводиться назофарингеальний повітровід?", a: ["У ротову порожнину", "У ніздрю", "У розріз на шиї"], c: 1 },
+    { q: "Для чого використовується термоковдра?", a: ["Маскування від тепловізора", "Боротьба з гіпотермією (буква H)", "Як ноші"], c: 1 },
+    { q: "Оптимальне місце для декомпресійної голки?", a: ["2-ге міжребер'я по середньоключичній лінії", "5-те міжребер'я", "Під лопатку"], c: 0 },
+    { q: "Що таке 'Жовта зона'?", a: ["Зона під прямим обстрілом", "Зона відносного прикриття", "Безпечна зона госпіталю"], c: 1 },
+    { q: "Перша дія при масивній кровотечі в паховій ділянці?", a: ["Турнікет", "Прямий тиск + тампонада", "Накладання шини"], c: 1 },
+    { q: "Як перевірити дихання за методом 'Бачу, чую, відчуваю'?", a: ["Протягом 10 секунд", "Протягом 2 хвилин", "Достатньо 1 секунди"], c: 0 },
+    { q: "Що робити з випавшими внутрішніми органами?", a: ["Вправити назад", "Накрити вологою стерильною серветкою", "Залити антисептиком"], c: 1 },
+    { q: "Найбільш часта причина смерті, якій можна запобігти?", a: ["Критична кровотеча", "Опіки", "Переломи"], c: 0 },
+    { q: "Коли можна послабити турнікет?", a: ["Коли поранений попросить", "Тільки медичному персоналу", "Через 10 хвилин"], c: 1 },
+    { q: "Що входить у 'E' (Eye) огляд?", a: ["Перевірка зору та сторонніх тіл", "Колір очей", "Нічого, буква E — це евакуація"], c: 0 },
+    { q: "При опіку обличчя насамперед підозрюємо:", a: ["Травму очей", "Опік дихальних шляхів", "Шок від болю"], c: 1 },
+    { q: "Скільки часу тиснемо на тампоновану рану без гемостатика?", a: ["30 секунд", "3 хвилини", "10 хвилин"], c: 2 },
+    { q: "Якщо поранений без свідомості, але дихає, кладемо його в:", a: ["Стабільне бокове положення", "Положення на спині", "Положення сидячи"], c: 0 }
+];
+
+
+let qCount = 0;
+function startCombatTest() {
+    document.getElementById('training-menu').style.display = 'none';
+    document.getElementById('training-game').style.display = 'block';
+    qCount = 0;
+    renderCombatQ();
+}
+
+function renderCombatQ() {
+    if(qCount >= combatQs.length) {
+        clearInterval(trainingTimer);
+        alert("ГЕРОЙ! ІСПИТ СКЛАДЕНО.");
+        hideTraining();
+        return;
+    }
+    const q = combatQs[qCount];
+    document.getElementById('game-content').innerHTML = `
+        <div style="font-family: var(--font-mil); color: var(--accent); margin-bottom: 10px;">SITUATION ${qCount+1}/20</div>
+        <h3 style="font-family: var(--font-mil); font-size: 1.8rem; margin-bottom: 30px;">${q.q}</h3>
+        <div class="step-box">
+            ${q.a.map((ans, i) => `<div class="step-item" onclick="checkCombat(${i === q.c})">${ans}</div>`).join('')}
+        </div>
+    `;
+    startTimer(15); // 15 секунд на кожне питання
+}
+
+function checkCombat(isCorrect) {
+    if(isCorrect) {
+        qCount++;
+        renderCombatQ();
+    } else {
+        alert("НЕВІРНО! РЕЗУЛЬТАТ ФАТАЛЬНИЙ.");
+        hideTraining();
+    }
+}
+const triageScenarios = [
+    {
+        situation: "Масштабний приліт. Перед вами четверо поранених. Кому першому наклеїте ЧЕРВОНУ карту (Immediate)?",
+        cases: [
+            { txt: "Боєць з ампутацією ноги, масивна кровотеча", cat: "Red" },
+            { txt: "Поранений, що кричить від болю в руці", cat: "Green" },
+            { txt: "Боєць без дихання та пульсу, відкрита травма черепа", cat: "Black" },
+            { txt: "Поранений з осколком у стегні, кровотеча зупинена", cat: "Yellow" }
+        ],
+        correct: 0 // Індекс правильної відповіді
+    },
+    {
+        situation: "Сортування за системою SALT. Боєць не дихає після відкриття дихальних шляхів. Яка категорія?",
+        cases: [
+            { txt: "Immediate (Червона)", cat: "Red" },
+            { txt: "Expectant (Чорна/Мертвий)", cat: "Black" },
+            { txt: "Delayed (Жовта)", cat: "Yellow" }
+        ],
+        correct: 1
+    }
+];
+
+function startTriage() {
+    document.getElementById('training-menu').style.display = 'none';
+    document.getElementById('training-game').style.display = 'block';
+    renderTriage(0);
+}
+
+function renderTriage(idx) {
+    const data = triageScenarios[idx];
+    const target = document.getElementById('game-content');
+    
+    target.innerHTML = `
+        <div style="font-family: var(--font-mil); color: var(--accent); margin-bottom: 10px;">TRIAGE MISSION</div>
+        <h3 style="font-family: var(--font-mil); font-size: 1.5rem; margin-bottom: 20px; line-height: 1.2;">${data.situation}</h3>
+        <div class="step-box">
+            ${data.cases.map((c, i) => `
+                <div class="step-item" onclick="checkTriage(${i === data.correct})">
+                    ${c.txt}
+                </div>
+            `).join('')}
+        </div>
+    `;
+    startTimer(15); // Таймер на прийняття рішення
+}
+
+function checkTriage(isCorrect) {
+    if(isCorrect) {
+        alert("ВІРНО. ПРІОРИТЕТИ РОЗСТАВЛЕНО ПРАВИЛЬНО.");
+        hideTraining();
+    } else {
+        alert("ПОМИЛКА СОРТУВАННЯ. ВИ ВТРАТИЛИ ЧАС, ЯКИЙ МІГ ВРЯТУВАТИ ІНШИХ.");
+        hideTraining();
+    }
+}
+function startTriageSequence() {
+    document.getElementById('training-menu').style.display = 'none';
+    document.getElementById('training-game').style.display = 'block';
+    
+    const scenario = {
+        situation: "Групове поранення. Розставте черговість допомоги (від найбільш критичного):",
+        correctOrder: [
+            "Масивна кровотеча",
+            "Важке дихання, поранення грудей",
+            "Перелом ноги, свідомий",
+            "Подряпини, ходить самостійно"
+        ]
+    };
+    
+    let currentStep = 0;
+    const target = document.getElementById('game-content');
+    target.innerHTML = `<h3 style="font-family: var(--font-mil); color: var(--accent); margin-bottom: 20px;">TRIAGE SEQUENCE:</h3><div class="step-box" id="t-box"></div>`;
+    
+    [...scenario.correctOrder].sort(() => Math.random() - 0.5).forEach(text => {
+        const div = document.createElement('div');
+        div.className = 'step-item';
+        div.innerText = text;
+        div.onclick = function() {
+            if (text === scenario.correctOrder[currentStep]) {
+                div.classList.add('correct');
+                currentStep++;
+                if (currentStep === scenario.correctOrder.length) {
+                    clearInterval(trainingTimer);
+                    alert("ВІРНО! Пріоритети розставлено правильно.");
+                    hideTraining();
+                }
+            } else {
+                alert("ПОМИЛКА! Ви втратили критичного пацієнта.");
+                hideTraining();
+            }
+        };
+        document.getElementById('t-box').appendChild(div);
+    });
+    startTimer(30); // 30 секунд на сортування
+}
+// Повна база предметів (40 одиниць)
+// Розширена база (60+ предметів)
+const allGear = [
+    // МЕДИЦИНА (isNeed: true)
+    { n: "Турнікет CAT Gen7", isNeed: true },
+    { n: "Ізраїльський бандаж 6'", isNeed: true },
+    { n: "Оклюзійна наклейка (Halo)", isNeed: true },
+    { n: "Назофарингеальний повітровід", isNeed: true },
+    { n: "Декомпресійна голка ARS", isNeed: true },
+    { n: "Гемостатичний бинт (QuikClot)", isNeed: true },
+    { n: "Термоковдра", isNeed: true },
+    { n: "Атравматичні ножиці", isNeed: true },
+    { n: "Маркер перманентний", isNeed: true },
+    { n: "Рукавички нітрилові", isNeed: true },
+    { n: "Армований скотч (Duct Tape)", isNeed: true },
+    { n: "Шина SAM Splint", isNeed: true },
+    { n: "Картка пораненого TCCC", isNeed: true },
+    { n: "Офтальмологічний щиток", isNeed: true },
+    { n: "Антибіотик (Vigamox)", isNeed: true },
+    { n: "Знеболювальне (Pill pack)", isNeed: true },
+    
+    // НЕПОТРІБ (isNeed: false)
+    { n: "Пляшка горілки", isNeed: false },
+    { n: "Шоколадний батончик", isNeed: false },
+    { n: "Звичайні нитки", isNeed: false },
+    { n: "Плюшевий ведмедик", isNeed: false },
+    { n: "Зубна щітка", isNeed: false },
+    { n: "Паперова карта", isNeed: false },
+    { n: "Запальничка Zippo", isNeed: false },
+    { n: "Powerbank", isNeed: false },
+    { n: "Ложка-вилка", isNeed: false },
+    { n: "Мило банне", isNeed: false },
+    { n: "Парацетамол", isNeed: false },
+    { n: "Ватні палички", isNeed: false },
+    { n: "Сонцезахисні окуляри", isNeed: false },
+    { n: "Навушники", isNeed: false },
+    { n: "Крем для рук", isNeed: false },
+    { n: "Книга 'Статут'", isNeed: false },
+    { n: "Дзеркальце", isNeed: false },
+    { n: "Молоток", isNeed: false },
+    { n: "Газовий балончик", isNeed: false },
+    { n: "Вологі серветки (дитячі)", isNeed: false },
+    { n: "Мазь 'Рятувальник'", isNeed: false },
+    { n: "Перекис водню (скло)", isNeed: false },
+    { n: "Вата гігроскопічна", isNeed: false },
+    { n: "Пластир 'Леопардовий'", isNeed: false },
+    { n: "Таблетки від кашлю", isNeed: false },
+    { n: "Енергетик", isNeed: false },
+    { n: "Пачка цигарок", isNeed: false },
+    { n: "Зарядка до iPhone", isNeed: false },
+    { n: "Ключі від КРАЗу", isNeed: false },
+    { n: "Старий бинт (марля)", isNeed: false }
+];
+
+function startBackpackSim() {
+    document.getElementById('training-menu').style.display = 'none';
+    document.getElementById('training-game').style.display = 'block';
+    selectedItems = [];
+    
+    // Логіка: беремо 3-4 справжніх та 6-7 фейкових
+    const realItems = allGear.filter(i => i.isNeed).sort(() => 0.5 - Math.random()).slice(0, 4);
+    const fakeItems = allGear.filter(i => !i.isNeed).sort(() => 0.5 - Math.random()).slice(0, 6);
+    
+    // Змішуємо їх разом
+    currentDisplayGear = [...realItems, ...fakeItems].sort(() => 0.5 - Math.random());
+    
+    renderBackpackGrid();
+    startTimer(30);
+}
+
+
+function renderBackpackGrid() {
+    const target = document.getElementById('game-content');
+    target.innerHTML = `
+        <div style="font-family: var(--font-mil); color: var(--accent); margin-bottom: 10px;">IFAK ASSEMBLY</div>
+        <h3 style="font-family: var(--font-mil); font-size: 1.3rem; margin-bottom: 20px;">Оберіть усі необхідні ТАКТИЧНІ предмети:</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" id="backpack-grid">
+            ${currentDisplayGear.map((item, i) => `
+                <div id="gear-${i}" class="step-item" style="padding: 15px; font-size: 0.9rem;" onclick="toggleGearItem(${i})">
+                    ${item.n}
+                </div>
+            `).join('')}
+        </div>
+        <button onclick="checkBackpack()" style="margin-top: 25px; width: 100%; padding: 15px; background: var(--accent); color: white; border: none; font-family: var(--font-mil); cursor: pointer; text-transform: uppercase;">ПЕРЕВІРИТИ РЮКЗАК</button>
+    `;
+}
+
+function toggleGearItem(index) {
+    const el = document.getElementById(`gear-${index}`);
+    if (selectedItems.includes(index)) {
+        selectedItems = selectedItems.filter(i => i !== index);
+        el.style.borderColor = "rgba(255,255,255,0.1)";
+        el.style.background = "rgba(255,255,255,0.05)";
+    } else {
+        selectedItems.push(index);
+        el.style.borderColor = "var(--accent)";
+        el.style.background = "rgba(255, 42, 61, 0.2)";
+    }
+}
+
+function checkBackpack() {
+    // Рахуємо скільки правильних предметів було в 10-ці
+    const correctInDisplay = currentDisplayGear.filter(item => item.isNeed).length;
+    
+    // Рахуємо скільки правильних вибрав користувач
+    const userCorrect = selectedItems.filter(i => currentDisplayGear[i].isNeed).length;
+    const userWrong = selectedItems.filter(i => !currentDisplayGear[i].isNeed).length;
+
+    if (userCorrect === correctInDisplay && userWrong === 0) {
+        clearInterval(trainingTimer);
+        alert("ІДЕАЛЬНО! Рюкзак зібрано вірно. Ви готові до виходу.");
+        hideTraining();
+    } else {
+        alert(`ПОМИЛКА! Ви забули важливе або взяли зайве. (Правильно: ${userCorrect}/${correctInDisplay}, Зайве: ${userWrong})`);
+        hideTraining();
+    }
+}
+
+</script>
+
+</body>
+</html>
